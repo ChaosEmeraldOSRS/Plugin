@@ -9,7 +9,6 @@ import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.gameval.InventoryID;
-import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.ItemStack;
@@ -83,8 +82,8 @@ public class LootTracker {
                 .equipment(readEquipment())
                 .inventory(readInventory());
 
-        if("Doom of Mokhaiotl".equals(e.getName()))
-            lootBuilder.delveLevel(client.getVarpValue(VarPlayerID.DOM_LAST_DELVE_LEVEL));
+        if("Doom of Mokhaiotl".equals(e.getName()) && e.getMetadata() instanceof Integer)
+            lootBuilder.delveLevel((Integer) e.getMetadata());
 
         for (ItemStack stack : e.getItems()){
             lootBuilder.item(buildItem(stack.getId(), stack.getQuantity()));
