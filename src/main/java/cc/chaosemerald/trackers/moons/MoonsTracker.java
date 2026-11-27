@@ -69,7 +69,7 @@ public class MoonsTracker {
 
     @Subscribe
     public void onGameStateChanged(GameStateChanged e){
-        if (e.getGameState() == GameState.LOGIN_SCREEN)
+        if(e.getGameState() == GameState.LOGIN_SCREEN)
             lastChestCount = -1;
     }
 

@@ -70,7 +70,7 @@ public class LootTracker {
 
     @Subscribe
     public void onLootReceived(LootReceived e){
-        if (e.getType() == LootRecordType.PLAYER)
+        if(e.getType() == LootRecordType.PLAYER)
             return;
 
         if(e.getType() == LootRecordType.PICKPOCKET && !hasValuableStack(e.getItems()))
@@ -85,7 +85,7 @@ public class LootTracker {
         if("Doom of Mokhaiotl".equals(e.getName()) && e.getMetadata() instanceof Integer)
             lootBuilder.delveLevel((Integer) e.getMetadata());
 
-        for (ItemStack stack : e.getItems()){
+        for(ItemStack stack : e.getItems()){
             lootBuilder.item(buildItem(stack.getId(), stack.getQuantity()));
         }
 

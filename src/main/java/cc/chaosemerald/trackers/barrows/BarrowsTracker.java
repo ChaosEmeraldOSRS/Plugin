@@ -39,11 +39,11 @@ public class BarrowsTracker {
         brothersBeaten.clear();
 
         Player player = client.getLocalPlayer();
-        if (player == null || player.getWorldLocation().getRegionID() != CRYPT_REGION)
+        if(player == null || player.getWorldLocation().getRegionID() != CRYPT_REGION)
             return;
 
-        for (BarrowsBrother brother : BarrowsBrother.values()){
-            if (client.getVarbitValue(brother.getDeadVarbit()) == 1)
+        for(BarrowsBrother brother : BarrowsBrother.values()){
+            if(client.getVarbitValue(brother.getDeadVarbit()) == 1)
                 brothersBeaten.add(brother);
         }
     }

@@ -1,5 +1,6 @@
 package cc.chaosemerald;
 
+import cc.chaosemerald.panel.data.PanelRecord;
 import cc.chaosemerald.trackers.barrows.BarrowsChestRecord;
 import cc.chaosemerald.trackers.clues.ClueCasketRecord;
 import cc.chaosemerald.trackers.coffer.CofferRecord;
@@ -18,8 +19,10 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.swing.*;
 import java.io.IOException;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -46,7 +49,7 @@ public class ChaosEmeraldApiClient {
     public HttpUrl getBaseUrl(){
         String configUrl = config.baseUrl().trim();
         String lower = configUrl.toLowerCase();
-        if (!lower.startsWith("http://") && !lower.startsWith("https://"))
+        if(!lower.startsWith("http://") && !lower.startsWith("https://"))
             configUrl = "https://" + configUrl;
 
         HttpUrl url = HttpUrl.parse(configUrl);
@@ -72,6 +75,7 @@ public class ChaosEmeraldApiClient {
         badUrlWarned = true;
     }
 
+    // POST Requests
     public void sendKCPayload(LootRecord record){
         if(!config.sendLoot())
             return;
@@ -120,43 +124,27 @@ public class ChaosEmeraldApiClient {
 
         post("v1/heartbeat", new JsonObject());
     }
+    // END POST Requests
+
+    // GET Requests
+    public void fetchPanel(Consumer<PanelRecord> content, Runnable failed){
+        get("v1/panel", PanelRecord.class, content, failed);
+    }
+    // END GET Requests
 
     private void post(String path, Object payload){
         HttpUrl base = getBaseUrl();
-        if (base == null){
+        if(base == null)
             return;
-        }
-
-        ClanChannel clanChannel = client.getClanChannel();
-        String clan = clanChannel != null ? clanChannel.getName() : null;
-
-        Player player = client.getLocalPlayer();
-        String rsn = player != null ? player.getName() : null;
 
         HttpUrl url = base.newBuilder().addPathSegments(path).build();
 
         JsonObject json = gson.toJsonTree(payload).getAsJsonObject();
         json.addProperty("id", UUID.randomUUID().toString());
+
         RequestBody body = RequestBody.create(JSON, gson.toJson(json));
 
-        Request.Builder builder = new Request.Builder().url(url).post(body);
-        if (clan != null){
-            builder.header("X-Clan", clan);
-        }
-        if (rsn != null){
-            builder.header("X-Rsn", rsn);
-        }
-
-        builder.header("X-World", String.valueOf(client.getWorld()));
-
-        String worldTypes = client.getWorldType().stream()
-                .map(Enum::name)
-                .collect(Collectors.joining(","));
-        if (!worldTypes.isEmpty()){
-            builder.header("X-World-Type", worldTypes);
-        }
-
-        Request request = builder.build();
+        Request request = getPlayerDetails(url).post(body).build();
 
         httpClient.newCall(request).enqueue(new Callback(){
             @Override
@@ -166,13 +154,70 @@ public class ChaosEmeraldApiClient {
 
             @Override
             public void onResponse(@Nonnull Call call, @Nonnull Response response){
-                try (response){
-                    if (!response.isSuccessful()){
+                try(response){
+                    if(!response.isSuccessful()){
                         log.warn("POST {} returned {}", url, response.code());
                     }
                 }
             }
         });
+    }
+
+    private <T> void get(String path, Class<T> type, Consumer<T> content, Runnable failure){
+        HttpUrl base = getBaseUrl();
+        if(base == null)
+            return;
+
+        HttpUrl url = base.newBuilder().addPathSegments(path).build();
+        Request request = getPlayerDetails(url).build();
+
+        httpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                log.warn("GET {} failed", url, e);
+                SwingUtilities.invokeLater(failure);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try(response){
+                    if(!response.isSuccessful() || response.body() == null){
+                        log.warn("GET {} returned {}", url, response.code());
+                        SwingUtilities.invokeLater(failure);
+                        return;
+                    }
+
+                    T result = gson.fromJson(response.body().charStream(), type);
+                    SwingUtilities.invokeLater(() -> content.accept(result));
+                }
+            }
+        });
+    }
+
+    private Request.Builder getPlayerDetails(HttpUrl url){
+        ClanChannel clanChannel = client.getClanChannel();
+        String clan = clanChannel != null ? clanChannel.getName() : null;
+
+        Player player = client.getLocalPlayer();
+        String rsn = player != null ? player.getName() : null;
+
+        Request.Builder builder = new Request.Builder().url(url);
+        if(clan != null)
+            builder.header("X-Clan", clan);
+
+        if(rsn != null)
+            builder.header("X-Rsn", rsn);
+
+        builder.header("X-World", String.valueOf(client.getWorld()));
+
+        String worldTypes = client.getWorldType().stream()
+                .map(Enum::name)
+                .collect(Collectors.joining(","));
+
+        if(!worldTypes.isEmpty())
+            builder.header("X-World-Type", worldTypes);
+
+        return builder;
     }
 
 }

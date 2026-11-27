@@ -53,9 +53,9 @@ public class ClueTracker {
 
             String name = itemManager.getItemComposition(item.getId()).getName().toLowerCase();
 
-            if(name.startsWith(CLUE)) {
+            if(name.startsWith(CLUE)){
                 newClueIds.put(tierOf(name, CLUE), item.getId());
-            }else if(name.startsWith(CASKET)) {
+            } else if(name.startsWith(CASKET)){
                 newCasketCounts.merge(tierOf(name, CASKET), item.getQuantity(), Integer::sum);
             }
         }
@@ -69,9 +69,9 @@ public class ClueTracker {
 
             if(before == null && after != null){
                 clueAppeared(tier, after);
-            }else if(before != null && after != null && !before.equals(after)){
+            } else if(before != null && after != null && !before.equals(after)){
                 steps.merge(tier, 1, Integer::sum);
-            }else if(before != null && after == null){
+            } else if(before != null && after == null){
                 clueGone(tier, before, newCasketCounts);
             }
         }
