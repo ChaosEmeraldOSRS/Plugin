@@ -56,7 +56,9 @@ public class XPTracker implements Tracker {
     }
 
     @Override
-    public void onDisable(){}
+    public void onDisable(){
+        reset();
+    }
 
     @Subscribe
     public void onStatChanged(StatChanged e){

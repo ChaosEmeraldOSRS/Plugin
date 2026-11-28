@@ -1,6 +1,7 @@
 package cc.chaosemerald.trackers.pet;
 
 import cc.chaosemerald.ChaosEmeraldApiClient;
+import cc.chaosemerald.trackers.Tracker;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameTick;
@@ -14,7 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Singleton
-public class PetTracker {
+public class PetTracker implements Tracker {
 
     private static final Pattern PET = Pattern.compile("^You (?:have a funny feeling like you|feel something weird sneaking)");
     private static final Pattern UNTRADEABLE = Pattern.compile("^Untradeable drop: (?<item>.+?)\\.?$");
@@ -32,9 +33,6 @@ public class PetTracker {
     PetTracker(ChaosEmeraldApiClient apiClient){
         this.apiClient = apiClient;
     }
-
-    public void onEnable(){}
-    public void onDisable(){}
 
     @Subscribe
     public void onChatMessage(ChatMessage e){

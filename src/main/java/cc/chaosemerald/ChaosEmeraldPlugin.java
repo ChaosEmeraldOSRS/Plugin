@@ -9,6 +9,7 @@ import cc.chaosemerald.trackers.loot.clues.ClueTracker;
 import cc.chaosemerald.trackers.clanbroadcast.ClanBroadcastTracker;
 import cc.chaosemerald.trackers.loot.LootTracker;
 import cc.chaosemerald.trackers.loot.moons.MoonsTracker;
+import cc.chaosemerald.trackers.pet.PetTracker;
 import cc.chaosemerald.trackers.xp.XPTracker;
 import com.google.inject.Provides;
 import javax.inject.Inject;
@@ -75,6 +76,9 @@ public class ChaosEmeraldPlugin extends Plugin {
     private XPTracker xpTracker;
 
     @Inject
+    private PetTracker petTracker;
+
+    @Inject
     private Client client;
 
     private boolean reloadPanel;
@@ -103,6 +107,7 @@ public class ChaosEmeraldPlugin extends Plugin {
         registerTracker(barrowsTracker);
         registerTracker(clueTracker);
         registerTracker(collectionLogTracker);
+        registerTracker(petTracker);
     }
 
     @Override
@@ -121,6 +126,7 @@ public class ChaosEmeraldPlugin extends Plugin {
         unregisterTracker(barrowsTracker);
         unregisterTracker(clueTracker);
         unregisterTracker(collectionLogTracker);
+        unregisterTracker(petTracker);
     }
 
     public void checkHeartbeatRegistration(){
