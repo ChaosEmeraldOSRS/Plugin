@@ -27,6 +27,7 @@ public class ChaosEmeraldPanel extends PluginPanel {
     private final JPanel dropsContainer = new JPanel(new BorderLayout());
 
     private ProfileRecord lastFoundProfile;
+    private final JButton reloadButton = new JButton("Reload");
 
     @Inject
     ChaosEmeraldPanel(ImageLoader imageLoader, ChaosEmeraldApiClient apiClient){
@@ -67,11 +68,15 @@ public class ChaosEmeraldPanel extends PluginPanel {
     }
 
     private void showTabsLoading(){
+        reloadButton.setEnabled(false);
         updateContainer(eventsContainer, new MessageSection("Loading events...", ""));
         updateContainer(dropsContainer, new MessageSection("Loading drops...", ""));
     }
 
     private void showPanel(PanelRecord record){
+        reloadButton.setEnabled(true);
+        reloadButton.setText("Reload");
+
         updateContainer(eventsContainer, new EventsPanel(imageLoader, record));
         updateContainer(dropsContainer, new DropsPanel(imageLoader, record));
 
@@ -82,11 +87,14 @@ public class ChaosEmeraldPanel extends PluginPanel {
                 this.lastFoundProfile = profile;
             }
         }else if(lastFoundProfile == null){
-            updateContainer(profileContainer, new ProfileSection(imageLoader, ProfileRecord.empty("Not logged in"), "Log in to see your clan profile."));
+            updateContainer(profileContainer, new ProfileSection(imageLoader, ProfileRecord.empty("Not logged in"), "Log in to see your clan profile"));
         }
     }
 
     private void showError(){
+        reloadButton.setEnabled(true);
+        reloadButton.setText("Reload");
+
         updateContainer(eventsContainer, new MessageSection("Couldn't reach the configured website.", ""));
         updateContainer(dropsContainer, new MessageSection("Couldn't reach the configured website.", ""));
 
@@ -118,15 +126,18 @@ public class ChaosEmeraldPanel extends PluginPanel {
 
         tabs.select(eventTab);
 
-        JButton reloadPanelButton = new JButton("Reload");
-        reloadPanelButton.addActionListener(e -> reloadPanel());
+        reloadButton.addActionListener(e -> {
+            reloadButton.setEnabled(false);
+            reloadButton.setText("Loading...");
+            reloadPanel();
+        });
 
         JPanel tabsButtonRow = new JPanel(new BorderLayout());
         tabsButtonRow.setBorder(new EmptyBorder(6, 6, 6, 6));
 
         tabs.setLayout(new FlowLayout(FlowLayout.LEFT, 8, 0));
         tabsButtonRow.add(tabs, BorderLayout.CENTER);
-        tabsButtonRow.add(reloadPanelButton, BorderLayout.EAST);
+        tabsButtonRow.add(reloadButton, BorderLayout.EAST);
 
         north.add(tabsButtonRow, BorderLayout.SOUTH);
 
