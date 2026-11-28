@@ -19,6 +19,12 @@ import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
 
+import net.runelite.api.Client;
+import net.runelite.api.GameState;
+import net.runelite.api.events.GameStateChanged;
+import net.runelite.api.events.GameTick;
+import javax.swing.SwingUtilities;
+
 import java.awt.image.BufferedImage;
 @PluginDescriptor(
     name = "ChaosEmerald",
@@ -55,6 +61,11 @@ public class ChaosEmeraldPlugin extends Plugin {
 
     @Inject
     private ClueTracker clueTracker;
+
+    @Inject
+    private Client client;
+
+    private boolean reloadPanel;
 
     @Override
     protected void startUp() throws Exception {
@@ -124,5 +135,21 @@ public class ChaosEmeraldPlugin extends Plugin {
 
         clientToolbar.removeNavigation(navButton);
         navButton = null;
+    }
+
+    @Subscribe
+    public void onGameStateChanged(GameStateChanged e){
+        if(e.getGameState() == GameState.LOGGED_IN)
+            reloadPanel = true;
+    }
+
+    @Subscribe
+    public void onGameTick(GameTick tick){
+        if(!reloadPanel || client.getLocalPlayer() == null || client.getLocalPlayer().getName() == null)
+            return;
+
+        reloadPanel = false;
+        if(navButton != null)
+            SwingUtilities.invokeLater(panel::onActivate);
     }
 }

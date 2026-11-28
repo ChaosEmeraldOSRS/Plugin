@@ -1,23 +1,16 @@
-package cc.chaosemerald.panel;
+package cc.chaosemerald.panel.content;
 
 import cc.chaosemerald.panel.data.EventRecord;
 import cc.chaosemerald.panel.data.ImageLoader;
 import cc.chaosemerald.panel.data.PanelRecord;
-import cc.chaosemerald.panel.data.ProfileRecord;
-import net.runelite.client.ui.ColorScheme;
-import net.runelite.client.ui.FontManager;
-import net.runelite.client.ui.components.ProgressBar;
-import net.runelite.client.util.ImageUtil;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.image.BaseMultiResolutionImage;
-import java.awt.image.BufferedImage;
 
 public class EventsPanel extends JPanel {
 
-    EventsPanel(ImageLoader imageLoader, PanelRecord record){
+    public EventsPanel(ImageLoader imageLoader, PanelRecord record){
         setLayout(new BorderLayout(7, 7));
         setBorder(new EmptyBorder(6, 6, 6, 6));
 

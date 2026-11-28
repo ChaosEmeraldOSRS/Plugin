@@ -1,8 +1,13 @@
 package cc.chaosemerald.panel;
 
 import cc.chaosemerald.ChaosEmeraldApiClient;
+import cc.chaosemerald.panel.content.DropsPanel;
+import cc.chaosemerald.panel.content.EventsPanel;
+import cc.chaosemerald.panel.content.MessageSection;
+import cc.chaosemerald.panel.content.ProfileSection;
 import cc.chaosemerald.panel.data.ImageLoader;
 import cc.chaosemerald.panel.data.PanelRecord;
+import cc.chaosemerald.panel.data.ProfileRecord;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.ui.components.materialtabs.MaterialTab;
 import net.runelite.client.ui.components.materialtabs.MaterialTabGroup;
@@ -17,6 +22,12 @@ public class ChaosEmeraldPanel extends PluginPanel {
     private final ImageLoader imageLoader;
     private final ChaosEmeraldApiClient apiClient;
 
+    private final JPanel profileContainer = new JPanel(new BorderLayout());
+    private final JPanel eventsContainer = new JPanel(new BorderLayout());
+    private final JPanel dropsContainer = new JPanel(new BorderLayout());
+
+    private ProfileRecord lastFoundProfile;
+
     @Inject
     ChaosEmeraldPanel(ImageLoader imageLoader, ChaosEmeraldApiClient apiClient){
         super(false);
@@ -27,47 +38,84 @@ public class ChaosEmeraldPanel extends PluginPanel {
         setLayout(new BorderLayout());
         setBorder(new EmptyBorder(0, 0, 0, 0));
 
-        showLoading();
+        buildPanel();
+        showPanelLoading();
     }
 
     @Override
     public void onActivate(){
-        showLoading();
+        showTabsLoading();
+        reloadPanel();
+    }
+
+    private void reloadPanel(){
         apiClient.fetchPanel(this::showPanel, this::showError);
     }
 
-    private void setContent(JComponent content){
-        removeAll();
-        add(content, BorderLayout.CENTER);
-        revalidate();
-        repaint();
+    private void updateContainer(JPanel container, JComponent content){
+        container.removeAll();
+        container.add(content, BorderLayout.CENTER);
+        container.revalidate();
+        container.repaint();
     }
 
-    private void showLoading(){
-        setContent(new JLabel("Loading..."));
+    private void showPanelLoading(){
+        ProfileRecord loadingRecord = ProfileRecord.empty("Loading...");
+        updateContainer(profileContainer, new ProfileSection(imageLoader, loadingRecord, "Please wait"));
+
+        showTabsLoading();
+    }
+
+    private void showTabsLoading(){
+        updateContainer(eventsContainer, new MessageSection("Loading events...", ""));
+        updateContainer(dropsContainer, new MessageSection("Loading drops...", ""));
     }
 
     private void showPanel(PanelRecord record){
-        setContent(buildContent(record));
+        updateContainer(eventsContainer, new EventsPanel(imageLoader, record));
+        updateContainer(dropsContainer, new DropsPanel(imageLoader, record));
+
+        ProfileRecord profile = record.getProfile();
+        if(profile != null) {
+            if(!profile.equals(lastFoundProfile)) {
+                updateContainer(profileContainer, new ProfileSection(imageLoader, profile, "Clan profile not found."));
+                this.lastFoundProfile = profile;
+            }
+        }else if(lastFoundProfile == null){
+            updateContainer(profileContainer, new ProfileSection(imageLoader, ProfileRecord.empty("Not logged in"), "Log in to see your clan profile."));
+        }
     }
 
     private void showError(){
-        setContent(new JLabel("Couldn't reach the webserver."));
+        updateContainer(eventsContainer, new MessageSection("Couldn't reach the configured website.", ""));
+        updateContainer(dropsContainer, new MessageSection("Couldn't reach the configured website.", ""));
+
+        if(lastFoundProfile == null)
+            updateContainer(profileContainer, new ProfileSection(imageLoader, ProfileRecord.empty("Couldn't reach website"), "Reload to try again."));
     }
 
-    private JPanel buildContent(PanelRecord record){
-        JPanel content = new JPanel(new BorderLayout());
-
+    private void buildPanel(){
         JPanel north = new JPanel(new BorderLayout());
 
-        north.add(new ProfileSection(imageLoader, record.getProfile()), BorderLayout.NORTH);
+        north.add(profileContainer, BorderLayout.NORTH);
 
         JPanel tabDisplay = new JPanel(new BorderLayout());
         MaterialTabGroup tabs = new MaterialTabGroup(tabDisplay);
-        MaterialTab eventTab = new MaterialTab("Events", tabs, new EventsPanel(imageLoader, record));
-        MaterialTab dropTab = new MaterialTab("Drops", tabs, new DropsPanel(imageLoader, record));
+
+        MaterialTab eventTab = new MaterialTab("Events", tabs, eventsContainer);
+        eventTab.setOnSelectEvent(() -> {
+            reloadPanel();
+            return true;
+        });
         tabs.addTab(eventTab);
+
+        MaterialTab dropTab = new MaterialTab("Drops", tabs, dropsContainer);
+        dropTab.setOnSelectEvent(() -> {
+            reloadPanel();
+            return true;
+        });
         tabs.addTab(dropTab);
+
         tabs.select(eventTab);
 
         JButton reloadPanelButton = new JButton("Reload");
@@ -82,16 +130,14 @@ public class ChaosEmeraldPanel extends PluginPanel {
 
         north.add(tabsButtonRow, BorderLayout.SOUTH);
 
-        content.add(north, BorderLayout.NORTH);
+        add(north, BorderLayout.NORTH);
 
         JScrollPane scrollableSection = new JScrollPane(tabDisplay);
         scrollableSection.setBorder(null);
         scrollableSection.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollableSection.getVerticalScrollBar().setUnitIncrement(16);
 
-        content.add(scrollableSection, BorderLayout.CENTER);
-
-        return content;
+        add(scrollableSection, BorderLayout.CENTER);
     }
 
 }

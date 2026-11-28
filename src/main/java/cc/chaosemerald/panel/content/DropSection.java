@@ -1,4 +1,4 @@
-package cc.chaosemerald.panel;
+package cc.chaosemerald.panel.content;
 
 import cc.chaosemerald.panel.data.DropRecord;
 import cc.chaosemerald.panel.data.ImageLoader;
@@ -13,7 +13,7 @@ import java.awt.image.BaseMultiResolutionImage;
 
 public class DropSection extends JPanel {
 
-    DropSection(ImageLoader imageLoader, DropRecord record){
+    public DropSection(ImageLoader imageLoader, DropRecord record){
         setLayout(new BorderLayout(7, 7));
         setBackground(ColorScheme.DARKER_GRAY_COLOR);
         setBorder(new EmptyBorder(10, 10, 10, 10));

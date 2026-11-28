@@ -1,7 +1,6 @@
-package cc.chaosemerald.panel;
+package cc.chaosemerald.panel.content;
 
 import cc.chaosemerald.panel.data.DropRecord;
-import cc.chaosemerald.panel.data.EventRecord;
 import cc.chaosemerald.panel.data.ImageLoader;
 import cc.chaosemerald.panel.data.PanelRecord;
 
@@ -11,7 +10,7 @@ import java.awt.*;
 
 public class DropsPanel extends JPanel {
 
-    DropsPanel(ImageLoader imageLoader, PanelRecord record){
+    public DropsPanel(ImageLoader imageLoader, PanelRecord record){
         setLayout(new BorderLayout(7, 7));
         setBorder(new EmptyBorder(6, 6, 6, 6));
 

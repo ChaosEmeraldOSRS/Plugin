@@ -21,4 +21,8 @@ public class ProfileRecord {
 
     String rankIcon;
 
+    public static ProfileRecord empty(String rsn){
+        return new ProfileRecord(rsn, false, null, null, 0, null, 0, null, 0, null);
+    }
+
 }

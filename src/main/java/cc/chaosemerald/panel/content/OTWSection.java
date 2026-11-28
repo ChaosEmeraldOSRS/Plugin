@@ -1,6 +1,5 @@
-package cc.chaosemerald.panel;
+package cc.chaosemerald.panel.content;
 
-import cc.chaosemerald.panel.data.EventRecord;
 import cc.chaosemerald.panel.data.ImageLoader;
 import cc.chaosemerald.panel.data.OTWEventRecord;
 import net.runelite.client.ui.ColorScheme;
@@ -11,15 +10,10 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.image.BaseMultiResolutionImage;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 
-public class EventSection extends JPanel {
+public class OTWSection extends JPanel {
 
-    EventSection(ImageLoader imageLoader, EventRecord record){
+    public OTWSection(ImageLoader imageLoader, OTWEventRecord record){
         setLayout(new BorderLayout(7, 7));
         setBackground(ColorScheme.DARKER_GRAY_COLOR);
         setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -35,24 +29,7 @@ public class EventSection extends JPanel {
         name.setForeground(ColorScheme.LIGHT_GRAY_COLOR.brighter());
         eventDetails.add(name, BorderLayout.CENTER);
 
-        ZonedDateTime start = Instant.parse(record.getStartsAt()).atZone(ZoneId.systemDefault());
-        int day = start.getDayOfMonth();
-        String suffix;
-        if(day >= 11 && day <= 13)
-            suffix = "th";
-        else if(day % 10 == 1)
-            suffix = "st";
-        else if(day % 10 == 2)
-            suffix = "nd";
-        else if(day % 10 == 3)
-            suffix = "rd";
-        else
-            suffix = "th";
-
-        String startsAtText = "Starts " + day + suffix + " "
-                + start.format(DateTimeFormatter.ofPattern("MMM h:mma", Locale.ENGLISH));
-
-        JLabel otwTimeLeft = new JLabel(startsAtText);
+        JLabel otwTimeLeft = new JLabel(record.getSubject() + " · " + record.getTimeLeft());
         otwTimeLeft.setForeground(ColorScheme.MEDIUM_GRAY_COLOR.brighter().brighter());
         eventDetails.add(otwTimeLeft, BorderLayout.SOUTH);
 
@@ -73,7 +50,30 @@ public class EventSection extends JPanel {
 
         eventHeader.add(avatarIcon, BorderLayout.WEST);
         eventHeader.add(eventDetails, BorderLayout.CENTER);
-        add(eventHeader, BorderLayout.CENTER);
+        add(eventHeader, BorderLayout.NORTH);
+
+        // Top 3 Leaderboard
+        JPanel leaderboard = new JPanel(new GridLayout(0, 1, 0, 3));
+        leaderboard.setOpaque(false);
+
+        for(OTWEventRecord.Standing row : record.getTop()){
+            JPanel rowPanel = new JPanel(new BorderLayout());
+            rowPanel.setBorder(new EmptyBorder(2, 4, 2, 4));
+            rowPanel.setBackground(ColorScheme.DARK_GRAY_COLOR);
+
+            JLabel rsn = new JLabel(row.getRank() + ". " + row.getRsn());
+            rsn.setForeground(ColorScheme.LIGHT_GRAY_COLOR.brighter());
+
+            JLabel gains = new JLabel(row.getGainedText());
+            gains.setForeground(ColorScheme.MEDIUM_GRAY_COLOR.brighter().brighter());
+
+            rowPanel.add(rsn, BorderLayout.WEST);
+            rowPanel.add(gains, BorderLayout.EAST);
+
+            leaderboard.add(rowPanel);
+        }
+
+        add(leaderboard, BorderLayout.CENTER);
     }
 
 }

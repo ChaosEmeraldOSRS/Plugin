@@ -1,8 +1,6 @@
-package cc.chaosemerald.panel;
+package cc.chaosemerald.panel.content;
 
-import cc.chaosemerald.ChaosEmeraldPlugin;
 import cc.chaosemerald.panel.data.ImageLoader;
-import cc.chaosemerald.panel.data.PanelRecord;
 import cc.chaosemerald.panel.data.ProfileRecord;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.FontManager;
@@ -17,7 +15,7 @@ import java.awt.image.BufferedImage;
 
 public class ProfileSection extends JPanel {
 
-    ProfileSection(ImageLoader imageLoader, ProfileRecord profile){
+    public ProfileSection(ImageLoader imageLoader, ProfileRecord profile, String statusText){
         setLayout(new BorderLayout(7, 7));
         setBackground(ColorScheme.DARKER_GRAY_COLOR);
         setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -48,13 +46,16 @@ public class ProfileSection extends JPanel {
         int currentRankFavour = profile.getCurrentRankFavour();
         String nextRank = profile.getNextRank();
         int nextRankFavour = profile.getNextRankFavour();
-        int percent = (favour - currentRankFavour) * 100 / (nextRankFavour - currentRankFavour);
+
+        int percent = 0;
+        if(profileFound && nextRank != null)
+            percent = (favour - currentRankFavour) * 100 / (nextRankFavour - currentRankFavour);
 
         JLabel favourDetail;
         if(profileFound){
             favourDetail = new JLabel(favour + " Favour · " + (nextRankFavour - favour) + " to rank up");
         }else{
-            favourDetail = new JLabel("Clan Account not found.");
+            favourDetail = new JLabel(statusText);
         }
         favourDetail.setForeground(ColorScheme.MEDIUM_GRAY_COLOR.brighter().brighter());
         playerDetails.add(favourDetail, BorderLayout.SOUTH);
@@ -65,13 +66,11 @@ public class ProfileSection extends JPanel {
         avatarIcon.setBackground(ColorScheme.DARK_GRAY_COLOR);
         avatarIcon.setPreferredSize(new Dimension(42, 42));
 
-        imageLoader.load(profile.getAvatarUrl(), image -> {
-            Image sharp = new BaseMultiResolutionImage(
-                    ImageUtil.resizeImage(image, 42, 42),
-                    ImageUtil.resizeImage(image, 63, 63),
-                    ImageUtil.resizeImage(image, 84, 84));
-            avatarIcon.setIcon(new ImageIcon(sharp));
-        });
+        BufferedImage defaultAvatar = ImageUtil.loadImageResource(ProfileSection.class, "/cc/chaosemerald/default-headshot.png");
+        avatarIcon.setIcon(resizeAvatar(defaultAvatar));
+
+        if(profile.getAvatarUrl() != null)
+            imageLoader.load(profile.getAvatarUrl(), image -> avatarIcon.setIcon(resizeAvatar(image)));
 
         add(avatarIcon, BorderLayout.WEST);
         add(playerDetails, BorderLayout.CENTER);
@@ -96,6 +95,13 @@ public class ProfileSection extends JPanel {
 
             add(south, BorderLayout.SOUTH);
         }
+    }
+
+    private static ImageIcon resizeAvatar(BufferedImage image){
+        return new ImageIcon(new BaseMultiResolutionImage(
+                ImageUtil.resizeImage(image, 42, 42),
+                ImageUtil.resizeImage(image, 63, 63),
+                ImageUtil.resizeImage(image, 84, 84)));
     }
 
 }
