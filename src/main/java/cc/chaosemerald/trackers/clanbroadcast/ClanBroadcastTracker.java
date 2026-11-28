@@ -1,6 +1,7 @@
-package cc.chaosemerald.trackers.coffer;
+package cc.chaosemerald.trackers.clanbroadcast;
 
 import cc.chaosemerald.ChaosEmeraldApiClient;
+import cc.chaosemerald.trackers.Tracker;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.client.eventbus.Subscribe;
@@ -9,7 +10,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
-public class ClanBroadcastTracker {
+public class ClanBroadcastTracker implements Tracker {
 
     private final ChaosEmeraldApiClient apiClient;
 
@@ -25,7 +26,7 @@ public class ClanBroadcastTracker {
 
         String message = e.getMessage();
 
-        apiClient.sendClanBroadcast(new ClanBroadcastRecord(message));
+        apiClient.sendClanBroadcastPayload(new ClanBroadcastRecord(message));
     }
 
 }

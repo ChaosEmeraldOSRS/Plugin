@@ -12,7 +12,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
-public class HeartbeatTracker {
+public class HeartbeatTracker implements Tracker {
 
     private static final int CHECK_IN_TICKS = 1000;
 

@@ -49,6 +49,17 @@ public interface ChaosEmeraldConfig extends Config {
     default boolean sendClanBroadcasts(){
         return false;
     }
+
+    @ConfigItem(
+        keyName = "sendXP",
+        name = "Send Levels and XP",
+        description = "Send Levels and XP every 3 minutes",
+        section = websiteDataSection,
+        position = 3
+    )
+    default boolean sendXP(){
+        return false;
+    }
     // End Website Sharing
 
     // Sidebar

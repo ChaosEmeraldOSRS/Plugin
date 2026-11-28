@@ -1,6 +1,7 @@
 package cc.chaosemerald.trackers.loot;
 
 import cc.chaosemerald.ChaosEmeraldApiClient;
+import cc.chaosemerald.trackers.Tracker;
 import cc.chaosemerald.trackers.loot.raids.RaidCompletionRecord;
 import cc.chaosemerald.trackers.loot.raids.RaidParty;
 import lombok.Value;
@@ -21,7 +22,7 @@ import javax.inject.Singleton;
 import java.util.*;
 
 @Singleton
-public class LootTracker {
+public class LootTracker implements Tracker {
 
     private static final List<String> RAIDS = List.of(
             "chambers of xeric", "theatre of blood",

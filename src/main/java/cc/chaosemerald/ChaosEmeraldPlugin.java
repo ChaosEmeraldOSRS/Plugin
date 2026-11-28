@@ -2,11 +2,14 @@ package cc.chaosemerald;
 
 import cc.chaosemerald.panel.ChaosEmeraldPanel;
 import cc.chaosemerald.trackers.HeartbeatTracker;
+import cc.chaosemerald.trackers.Tracker;
+import cc.chaosemerald.trackers.collection.CollectionLogTracker;
 import cc.chaosemerald.trackers.loot.barrows.BarrowsTracker;
 import cc.chaosemerald.trackers.loot.clues.ClueTracker;
-import cc.chaosemerald.trackers.coffer.ClanBroadcastTracker;
+import cc.chaosemerald.trackers.clanbroadcast.ClanBroadcastTracker;
 import cc.chaosemerald.trackers.loot.LootTracker;
 import cc.chaosemerald.trackers.loot.moons.MoonsTracker;
+import cc.chaosemerald.trackers.xp.XPTracker;
 import com.google.inject.Provides;
 import javax.inject.Inject;
 import net.runelite.client.config.ConfigManager;
@@ -26,6 +29,9 @@ import net.runelite.api.events.GameTick;
 import javax.swing.SwingUtilities;
 
 import java.awt.image.BufferedImage;
+import java.util.HashSet;
+import java.util.Set;
+
 @PluginDescriptor(
     name = "ChaosEmerald",
     description = "Helper for the ChaosEmerald clan website.",
@@ -63,32 +69,70 @@ public class ChaosEmeraldPlugin extends Plugin {
     private ClueTracker clueTracker;
 
     @Inject
+    private CollectionLogTracker collectionLogTracker;
+
+    @Inject
+    private XPTracker xpTracker;
+
+    @Inject
     private Client client;
 
     private boolean reloadPanel;
+    private final Set<Tracker> trackerRegistry = new HashSet<>();
 
     @Override
     protected void startUp() throws Exception {
-        eventBus.register(heartbeatTracker);
-        eventBus.register(lootTracker);
-        eventBus.register(moonsTracker);
-        eventBus.register(barrowsTracker);
-        eventBus.register(broadcastTracker);
-        eventBus.register(clueTracker);
+        if(config.sendLoot()){
+            registerLoot();
+        }
+        if(config.sendClanBroadcasts()) {
+            registerTracker(broadcastTracker);
+        }
+        if(config.sendXP()) {
+            registerTracker(xpTracker);
+        }
+
+        checkHeartbeatRegistration();
 
         loadPanel();
     }
 
+    public void registerLoot(){
+        registerTracker(lootTracker);
+        registerTracker(moonsTracker);
+        registerTracker(barrowsTracker);
+        registerTracker(clueTracker);
+        registerTracker(collectionLogTracker);
+    }
+
     @Override
     protected void shutDown() throws Exception {
-        eventBus.unregister(lootTracker);
-        eventBus.unregister(moonsTracker);
-        eventBus.unregister(barrowsTracker);
-        eventBus.unregister(broadcastTracker);
-        eventBus.unregister(clueTracker);
-        eventBus.unregister(heartbeatTracker);
+        unregisterLoot();
+        unregisterTracker(broadcastTracker);
+        unregisterTracker(xpTracker);
+        unregisterTracker(heartbeatTracker);
 
         unloadPanel();
+    }
+
+    public void unregisterLoot() {
+        unregisterTracker(lootTracker);
+        unregisterTracker(moonsTracker);
+        unregisterTracker(barrowsTracker);
+        unregisterTracker(clueTracker);
+        unregisterTracker(collectionLogTracker);
+    }
+
+    public void checkHeartbeatRegistration(){
+        // only load heartbeat if any tracker is enabled
+        if(!config.sendLoot()
+            && !config.sendXP()
+            && !config.sendClanBroadcasts()
+        ){
+            unregisterTracker(heartbeatTracker);
+        }else{
+            registerTracker(heartbeatTracker);
+        }
     }
 
     @Provides
@@ -101,13 +145,54 @@ public class ChaosEmeraldPlugin extends Plugin {
         if(!e.getGroup().equals(ChaosEmeraldConfig.GROUP))
             return;
 
+        checkHeartbeatRegistration();
+
         switch(e.getKey()){
             case "showSidebar":
             case "sidebarPriority":
                 unloadPanel();
                 loadPanel();
                 break;
+            case "sendLoot":
+                if(config.sendLoot()) {
+                    registerLoot();
+                }else{
+                    unregisterLoot();
+                }
+                break;
+            case "sendXP":
+                if(config.sendXP()) {
+                    registerTracker(xpTracker);
+                }else{
+                    unregisterTracker(xpTracker);
+                }
+                break;
+            case "sendClanBroadcasts":
+                if(config.sendClanBroadcasts()) {
+                    registerTracker(broadcastTracker);
+                }else{
+                    unregisterTracker(broadcastTracker);
+                }
+                break;
         }
+    }
+
+    private void registerTracker(Tracker tracker){
+        if(trackerRegistry.contains(tracker))
+            return;
+
+        eventBus.register(tracker);
+        trackerRegistry.add(tracker);
+        tracker.onEnable();
+    }
+
+    private void unregisterTracker(Tracker tracker){
+        if(!trackerRegistry.contains(tracker))
+            return;
+
+        eventBus.unregister(tracker);
+        trackerRegistry.remove(tracker);
+        tracker.onDisable();
     }
 
     private void loadPanel(){

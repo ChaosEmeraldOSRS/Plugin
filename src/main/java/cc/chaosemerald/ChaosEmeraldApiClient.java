@@ -1,12 +1,15 @@
 package cc.chaosemerald;
 
 import cc.chaosemerald.panel.data.PanelRecord;
+import cc.chaosemerald.trackers.collection.CollectionLogRecord;
 import cc.chaosemerald.trackers.loot.barrows.BarrowsChestRecord;
 import cc.chaosemerald.trackers.loot.clues.ClueCasketRecord;
-import cc.chaosemerald.trackers.coffer.ClanBroadcastRecord;
+import cc.chaosemerald.trackers.clanbroadcast.ClanBroadcastRecord;
 import cc.chaosemerald.trackers.loot.LootRecord;
 import cc.chaosemerald.trackers.loot.raids.RaidCompletionRecord;
 import cc.chaosemerald.trackers.loot.moons.LunarChestRecord;
+import cc.chaosemerald.trackers.pet.PetRecord;
+import cc.chaosemerald.trackers.xp.XPRecord;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import lombok.extern.slf4j.Slf4j;
@@ -77,32 +80,33 @@ public class ChaosEmeraldApiClient {
 
     // POST Requests
     public void sendKCPayload(LootRecord record){
-        if(!config.sendLoot())
-            return;
-
         post("v1/kc", record);
     }
 
     public void sendLunarChestPayload(LunarChestRecord record){
-        if(!config.sendLoot())
-            return;
-
         post("v1/lunar-chest", record);
     }
 
     public void sendBarrowsChestPayload(BarrowsChestRecord record){
-        if(!config.sendLoot())
-            return;
-
         post("v1/barrows-chest", record);
     }
 
-    public void sendClanBroadcast(ClanBroadcastRecord record){
-        if(!config.sendClanBroadcasts())
-            return;
-
+    public void sendClanBroadcastPayload(ClanBroadcastRecord record){
         post("v1/clan-broadcast", record);
     }
+
+    public void sendCollectionLogPayload(CollectionLogRecord record){
+        post("v1/collection-log", record);
+    }
+
+    public void sendPetPayload(PetRecord record){
+        post("v1/pet", record);
+    }
+
+    public void sendXPPayload(XPRecord record){
+        post("v1/xp", record);
+    }
+
 
     public void sendClueCasketPayload(ClueCasketRecord record){
         if(!config.sendLoot())
@@ -119,9 +123,6 @@ public class ChaosEmeraldApiClient {
     }
 
     public void sendHeartbeat(){
-        if(!config.sendLoot())
-            return;
-
         post("v1/heartbeat", new JsonObject());
     }
     // END POST Requests

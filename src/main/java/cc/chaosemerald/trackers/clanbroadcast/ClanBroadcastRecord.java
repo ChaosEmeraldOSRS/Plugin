@@ -1,4 +1,4 @@
-package cc.chaosemerald.trackers.coffer;
+package cc.chaosemerald.trackers.clanbroadcast;
 
 import lombok.Value;
 

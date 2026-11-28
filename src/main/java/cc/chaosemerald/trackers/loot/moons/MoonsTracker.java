@@ -1,6 +1,7 @@
 package cc.chaosemerald.trackers.loot.moons;
 
 import cc.chaosemerald.ChaosEmeraldApiClient;
+import cc.chaosemerald.trackers.Tracker;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.Player;
@@ -18,7 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Singleton
-public class MoonsTracker {
+public class MoonsTracker implements Tracker {
 
     private final Client client;
     private final ChaosEmeraldApiClient apiClient;

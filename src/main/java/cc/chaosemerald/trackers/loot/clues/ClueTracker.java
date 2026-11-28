@@ -1,6 +1,7 @@
 package cc.chaosemerald.trackers.loot.clues;
 
 import cc.chaosemerald.ChaosEmeraldApiClient;
+import cc.chaosemerald.trackers.Tracker;
 import lombok.Value;
 import net.runelite.api.GameState;
 import net.runelite.api.Item;
@@ -18,7 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Singleton
-public class ClueTracker {
+public class ClueTracker implements Tracker {
 
     private static final String CLUE = "clue scroll (";
     private static final String CASKET = "reward casket (";
@@ -38,6 +39,9 @@ public class ClueTracker {
         this.itemManager = itemManager;
         this.apiClient = apiClient;
     }
+
+    public void onEnable(){}
+    public void onDisable(){}
 
     @Subscribe
     public void onItemContainerChanged(ItemContainerChanged e){
