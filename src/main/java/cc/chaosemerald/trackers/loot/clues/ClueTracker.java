@@ -1,4 +1,4 @@
-package cc.chaosemerald.trackers.clues;
+package cc.chaosemerald.trackers.loot.clues;
 
 import cc.chaosemerald.ChaosEmeraldApiClient;
 import lombok.Value;

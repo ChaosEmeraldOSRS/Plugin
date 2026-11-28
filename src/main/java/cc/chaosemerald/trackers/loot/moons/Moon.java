@@ -1,4 +1,4 @@
-package cc.chaosemerald.trackers.moons;
+package cc.chaosemerald.trackers.loot.moons;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

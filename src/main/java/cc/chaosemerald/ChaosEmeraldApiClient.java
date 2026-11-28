@@ -1,12 +1,12 @@
 package cc.chaosemerald;
 
 import cc.chaosemerald.panel.data.PanelRecord;
-import cc.chaosemerald.trackers.barrows.BarrowsChestRecord;
-import cc.chaosemerald.trackers.clues.ClueCasketRecord;
-import cc.chaosemerald.trackers.coffer.CofferRecord;
+import cc.chaosemerald.trackers.loot.barrows.BarrowsChestRecord;
+import cc.chaosemerald.trackers.loot.clues.ClueCasketRecord;
+import cc.chaosemerald.trackers.coffer.ClanBroadcastRecord;
 import cc.chaosemerald.trackers.loot.LootRecord;
 import cc.chaosemerald.trackers.loot.raids.RaidCompletionRecord;
-import cc.chaosemerald.trackers.moons.LunarChestRecord;
+import cc.chaosemerald.trackers.loot.moons.LunarChestRecord;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import lombok.extern.slf4j.Slf4j;
@@ -97,11 +97,11 @@ public class ChaosEmeraldApiClient {
         post("v1/barrows-chest", record);
     }
 
-    public void sendCofferPayload(CofferRecord record){
-        if(!config.sendCoffer())
+    public void sendClanBroadcast(ClanBroadcastRecord record){
+        if(!config.sendClanBroadcasts())
             return;
 
-        post("v1/coffer", record);
+        post("v1/clan-broadcast", record);
     }
 
     public void sendClueCasketPayload(ClueCasketRecord record){

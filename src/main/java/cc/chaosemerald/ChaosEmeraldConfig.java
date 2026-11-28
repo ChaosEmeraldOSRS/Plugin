@@ -39,13 +39,14 @@ public interface ChaosEmeraldConfig extends Config {
     }
 
     @ConfigItem(
-        keyName = "sendCoffer",
-        name = "Send Clan Coffer Broadcasts",
-        description = "Send any clan coffer broadcasts seen in the clan chat.",
+        keyName = "sendClanBroadcasts",
+        name = "Send Clan Broadcasts",
+        description = "Send any clan broadcasts seen in the chat",
         section = websiteDataSection,
-        position = 2
+        position = 2,
+        warning = "This setting sends ALL clan broadcasts to the website which helps track coffer deposits and collection logs. It does not send clan player messages."
     )
-    default boolean sendCoffer(){
+    default boolean sendClanBroadcasts(){
         return false;
     }
     // End Website Sharing

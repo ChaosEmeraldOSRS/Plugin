@@ -1,4 +1,4 @@
-package cc.chaosemerald.trackers.barrows;
+package cc.chaosemerald.trackers.loot.barrows;
 
 import cc.chaosemerald.ChaosEmeraldApiClient;
 import net.runelite.api.Client;

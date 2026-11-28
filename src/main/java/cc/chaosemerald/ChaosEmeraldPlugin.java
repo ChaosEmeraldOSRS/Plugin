@@ -2,11 +2,11 @@ package cc.chaosemerald;
 
 import cc.chaosemerald.panel.ChaosEmeraldPanel;
 import cc.chaosemerald.trackers.HeartbeatTracker;
-import cc.chaosemerald.trackers.barrows.BarrowsTracker;
-import cc.chaosemerald.trackers.clues.ClueTracker;
-import cc.chaosemerald.trackers.coffer.CofferTracker;
+import cc.chaosemerald.trackers.loot.barrows.BarrowsTracker;
+import cc.chaosemerald.trackers.loot.clues.ClueTracker;
+import cc.chaosemerald.trackers.coffer.ClanBroadcastTracker;
 import cc.chaosemerald.trackers.loot.LootTracker;
-import cc.chaosemerald.trackers.moons.MoonsTracker;
+import cc.chaosemerald.trackers.loot.moons.MoonsTracker;
 import com.google.inject.Provides;
 import javax.inject.Inject;
 import net.runelite.client.config.ConfigManager;
@@ -57,7 +57,7 @@ public class ChaosEmeraldPlugin extends Plugin {
     private BarrowsTracker barrowsTracker;
 
     @Inject
-    private CofferTracker cofferTracker;
+    private ClanBroadcastTracker broadcastTracker;
 
     @Inject
     private ClueTracker clueTracker;
@@ -73,7 +73,7 @@ public class ChaosEmeraldPlugin extends Plugin {
         eventBus.register(lootTracker);
         eventBus.register(moonsTracker);
         eventBus.register(barrowsTracker);
-        eventBus.register(cofferTracker);
+        eventBus.register(broadcastTracker);
         eventBus.register(clueTracker);
 
         loadPanel();
@@ -84,7 +84,7 @@ public class ChaosEmeraldPlugin extends Plugin {
         eventBus.unregister(lootTracker);
         eventBus.unregister(moonsTracker);
         eventBus.unregister(barrowsTracker);
-        eventBus.unregister(cofferTracker);
+        eventBus.unregister(broadcastTracker);
         eventBus.unregister(clueTracker);
         eventBus.unregister(heartbeatTracker);
 
