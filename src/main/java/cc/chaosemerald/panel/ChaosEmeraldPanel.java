@@ -119,7 +119,7 @@ public class ChaosEmeraldPanel extends PluginPanel {
         tabs.select(eventTab);
 
         JButton reloadPanelButton = new JButton("Reload");
-        reloadPanelButton.addActionListener(e -> onActivate());
+        reloadPanelButton.addActionListener(e -> reloadPanel());
 
         JPanel tabsButtonRow = new JPanel(new BorderLayout());
         tabsButtonRow.setBorder(new EmptyBorder(6, 6, 6, 6));
